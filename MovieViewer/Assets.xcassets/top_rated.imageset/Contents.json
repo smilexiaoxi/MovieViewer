@@ -2,6 +2,7 @@
   "images" : [
     {
       "idiom" : "iphone",
+      "filename" : "top_rated.png",
       "scale" : "1x"
     },
     {
@@ -10,7 +11,6 @@
     },
     {
       "idiom" : "iphone",
-      "filename" : "top_rated.png",
       "scale" : "3x"
     }
   ],
