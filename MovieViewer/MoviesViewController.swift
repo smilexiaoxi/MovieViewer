@@ -11,13 +11,19 @@ import MBProgressHUD
 import AFNetworking
 
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate {
 
+    @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
     
     var movies: [NSDictionary]?
     var refreshControl: UIRefreshControl!
     var endpoint: String!
+    //var filterMovies: [NSDictionary]?
+    //var filteredData: [String]!
+    
+    //var data: [String]!
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +35,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.dataSource = self
         tableView.delegate = self
+        searchBar.delegate = self
         
         MBProgressHUD.showHUDAddedTo(self.view, animated: true)
         
@@ -55,10 +62,33 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                             self.movies = responseDictionary["results"] as! [NSDictionary]
                             self.tableView.reloadData()
                             MBProgressHUD.hideHUDForView(self.view, animated: true)
+
+                            //self.data = responseDictionary["title"] as? [String]
                     }
                 }
         })
         task.resume()
+        
+        //filterMovies = movies
+        //filteredData = data
+
+        
+        
+        self.navigationItem.title = "Movies"
+        if let navigationBar = navigationController?.navigationBar {
+            //navigationBar.setBackgroundImage(UIImage(named: "codepath-logo"), forBarMetrics: .Default)
+            //navigationBar.tintColor = UIColor(red: 1.0, green: 0.25, blue: 0.25, alpha: 0.8)
+            
+            let shadow = NSShadow()
+            shadow.shadowColor = UIColor.grayColor().colorWithAlphaComponent(0.5)
+            shadow.shadowOffset = CGSizeMake(2, 2);
+            shadow.shadowBlurRadius = 4;
+            navigationBar.titleTextAttributes = [
+                NSFontAttributeName : UIFont.boldSystemFontOfSize(22),
+                NSForegroundColorAttributeName : UIColor(red: 0.5, green: 0.15, blue: 0.15, alpha: 0.8),
+                NSShadowAttributeName : shadow
+            ]
+        }
 
         // Do any additional setup after loading the view.
     }
@@ -74,6 +104,7 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         }else{
             return 0
         }
+        //return data.count
     }
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
@@ -91,6 +122,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
             let imageURL = NSURL(string: baseUrl + posterPath)
             cell.posterView.setImageWithURL(imageURL!)
         }
+        
+        //cell.selectionStyle = .None
+        
+        //cell.textLabel?.text = data[indexPath.row]
 
         return cell
     }
@@ -156,6 +191,54 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 refreshControl.endRefreshing()	
         });
         task.resume()
+    }
+    
+    /*func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        filteredData = searchText.isEmpty ? data : data.filter({(dataString: String) -> Bool in
+            return dataString.rangeOfString(searchText, options: .CaseInsensitiveSearch) != nil
+        })
+        
+    }*/
+    
+    
+    /*func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+        // When there is no text, filteredData is the same as the original data
+        if searchText.isEmpty {
+            filterMovies = movies
+        } else {
+            // The user has entered text into the search box
+            // Use the filter method to iterate over all items in the data array
+            // For each item, return true if the item should be included and false if the
+            // item should NOT be included
+            
+            
+            filterMovies = movies!.filter({(dataItem: NSDictionary) -> Bool in
+                // If dataItem matches the searchText, return true to include it
+                    
+                let keys = self.movies as! AnyObject as [PFObject]
+                
+                    
+                    return contains(keys["title"], searchText)
+                
+                /*if dataItem.(searchText, options: .CaseInsensitiveSearch) != nil {
+                    return true
+                } else {
+                    return false
+                }*/
+            })
+        }
+        tableView.reloadData()
+    }*/
+    
+    
+    func searchBarTextDidBeginEditing(searchBar: UISearchBar) {
+        self.searchBar.showsCancelButton = true
+    }
+    
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+        searchBar.showsCancelButton = false
+        searchBar.text = ""
+        searchBar.resignFirstResponder()
     }
 
 
